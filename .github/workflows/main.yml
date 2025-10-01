@@ -1,4 +1,4 @@
-name: Main
+name: Build and Deploy Documentation
 
 on:
   push:
@@ -14,6 +14,9 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+env:
+  CARGO_TERM_COLOR: always
+
 # .github/workflows/docs.yml (snippet)
 jobs:
   build-and-deploy-docs:
@@ -22,17 +25,67 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
-      # NEW: install protoc so prost-build can run
+      # Cache protoc installation
+      - name: Cache protoc
+        id: cache-protoc
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/protoc
+          key: protoc-${{ runner.os }}-${{ hashFiles('**/build.rs') }}
+          restore-keys: |
+            protoc-${{ runner.os }}-
+
+      # Install protoc only if not cached
       - name: Install protoc
+        if: steps.cache-protoc.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y protobuf-compiler
           protoc --version
 
+      # Cache Rust dependencies and build artifacts
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      # Cache generated documentation
+      - name: Cache doc artifacts
+        uses: actions/cache@v4
+        with:
+          path: target/doc
+          key: ${{ runner.os }}-docs-${{ hashFiles('src/**/*.rs', 'Cargo.toml', 'build.rs', 'proto/**/*.proto') }}
+          restore-keys: |
+            ${{ runner.os }}-docs-
+
+      # Show cache status for debugging
+      - name: Show cache status
+        run: |
+          echo "Protoc cache hit: ${{ steps.cache-protoc.outputs.cache-hit }}"
+          echo "Checking protoc version..."
+          protoc --version || echo "protoc not found"
+          echo "Checking Rust cache..."
+          ls -la ~/.cargo/bin/ || echo "No cached Rust binaries"
+          echo "Checking build cache..."
+          ls -la target/ || echo "No cached build artifacts"
+
       - name: Build docs for gos only (no deps)
         env:
           RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
+          CARGO_INCREMENTAL: "0"  # Disable incremental compilation for better caching
+          CARGO_NET_RETRY: "10"   # Retry network requests
         run: |
+          echo "⏱️ Starting documentation build at $(date)"
+          start_time=$(date +%s)
+          
           # Create custom doc header for better styling
           cat > doc-header.html <<'HTML'
           <style>
@@ -45,7 +98,14 @@ jobs:
           </style>
           HTML
           
-          cargo doc --no-deps --all-features --package gos --lib
+          # Build with optimized flags for documentation
+          echo "🔨 Building documentation..."
+          cargo doc --no-deps --all-features --package gos --lib --jobs 2
+          
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          echo "✅ Documentation build completed in ${duration} seconds"
+          
           mkdir -p public
           cp -r target/doc/* public/
           
@@ -105,9 +165,20 @@ jobs:
           </html>
           HTML
 
+      # Cache the public directory for faster uploads
+      - name: Cache public directory
+        uses: actions/cache@v4
+        with:
+          path: public
+          key: ${{ runner.os }}-public-${{ hashFiles('public/**/*') }}
+          restore-keys: |
+            ${{ runner.os }}-public-
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
-        with: { path: public }
+        with: 
+          path: public
+          retention-days: 7  # Reduce storage costs
   deploy:
     needs: build-and-deploy-docs
     runs-on: ubuntu-latest
