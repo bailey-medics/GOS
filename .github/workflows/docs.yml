@@ -1,0 +1,32 @@
+name: Docs (gos → GitHub Pages)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write        # needed for Pages deploy
+  id-token: write     # needed for OIDC auth
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust (stable)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build docs for gos only (no deps)
+        env:
+          # Treat rustdoc warnings as errors, and enable docs.rs-style cfgs
+          RUSTDOCFLAGS: "-Dwarnings --cfg docsrs"
+        run: |
+          cargo doc --no-deps --all-features --package gos

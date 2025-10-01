@@ -4,10 +4,14 @@
   "ignorePaths": ["Cargo.lock", "target/**"],
   "words": [
     "bigserial",
+    "cfgs",
     "clippy",
     "compile_protos",
     "createuser",
     "defenses",
+    "docsrs",
+    "dtolnay",
+    "Dwarnings",
     "favor",
     "gitrepo",
     "grpcurl",
@@ -21,6 +25,8 @@
     "psql",
     "psql_ok",
     "rustc",
+    "rustdoc",
+    "RUSTDOCFLAGS",
     "timestamptz",
     "tlsv",
     "Tunables"
