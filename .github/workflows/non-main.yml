@@ -1,0 +1,121 @@
+name: Non-main branch workflows
+
+on:
+  push:
+    branches-ignore: [main, master]
+  pull_request:
+    branches-ignore: [main, master]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nonmain-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------- Code Quality Checks ----------
+  rust_quality_checks:
+    runs-on: ubuntu-latest
+    name: Rust Quality Checks
+    strategy:
+      matrix:
+        check: [formatting, linting, compilation, tests]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Run formatting check
+        if: matrix.check == 'formatting'
+        run: |
+          echo "🔧 Checking code formatting..."
+          cargo fmt --all -- --check
+
+      - name: Run linting
+        if: matrix.check == 'linting'
+        run: |
+          echo "🔍 Running Clippy linter..."
+          cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run compilation check
+        if: matrix.check == 'compilation'
+        run: |
+          echo "🔧 Checking compilation..."
+          cargo check --all-targets --all-features
+
+      - name: Run tests
+        if: matrix.check == 'tests'
+        run: |
+          echo "🧪 Running tests..."
+          cargo test --all-features
+
+  # ---------- Merge to main (only on push, never from main) ----------
+  merge-to-main:
+    runs-on: ubuntu-latest
+    name: Merge branch into main
+    needs: [rust_quality_checks]
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge branch into main and push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Ensure we have latest main locally
+          git fetch origin main:main || git fetch origin refs/heads/main:main
+
+          # Source branch name from the push event
+          BRANCH_NAME="${GITHUB_REF_NAME:-}"
+          BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -d '[:space:]')
+
+          if [ -z "$BRANCH_NAME" ]; then
+            echo "ERROR: Cannot determine source branch." >&2
+            exit 1
+          fi
+
+          if [ "$BRANCH_NAME" = "main" ]; then
+            echo "Not merging main into main. Exiting."
+            exit 0
+          fi
+
+          echo "Merging '$BRANCH_NAME' into main"
+          git checkout main
+
+          # Ensure the source branch exists locally
+          if ! git rev-parse --verify --quiet "$BRANCH_NAME"; then
+            echo "Fetching branch '$BRANCH_NAME' from origin"
+            git fetch origin "$BRANCH_NAME":"$BRANCH_NAME"
+          fi
+
+          # Attempt merge; on conflict, abort and fail
+          if git merge --no-ff "$BRANCH_NAME" -m "Merge branch '$BRANCH_NAME' into main"; then
+            echo "Merge succeeded"
+          else
+            echo "Merge conflict. Aborting."
+            git merge --abort || true
+            exit 1
+          fi
+
+          git push origin main
