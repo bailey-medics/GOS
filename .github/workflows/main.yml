@@ -122,23 +122,18 @@ jobs:
           fi
           
           mkdir -p public
+          
+          # Copy all documentation files
           cp -r target/doc/* public/
           
-          # Make the GOS documentation the homepage
-          # Move gos/index.html to the root and update relative paths
-          if [ -f "public/gos/index.html" ]; then
-            # Copy the main documentation as the homepage
-            cp public/gos/index.html public/index.html
-            
-            # Update relative paths in the homepage to work from root
-            sed -i 's|href="\.\./|href="|g' public/index.html
-            sed -i 's|src="\.\./|src="|g' public/index.html
-            sed -i 's|href="gos/|href="gos/|g' public/index.html
-            sed -i 's|src="gos/|src="gos/|g' public/index.html
-            
-            echo "✅ Documentation homepage created"
+          # Move the gos documentation to the root level
+          if [ -d "public/gos" ]; then
+            # Copy gos content to root, then clean up
+            cp -r public/gos/* public/
+            # Keep the gos directory for any remaining references
+            echo "✅ GOS documentation moved to root level"
           else
-            echo "❌ Warning: gos/index.html not found"
+            echo "❌ Warning: gos directory not found in documentation"
           fi
 
       # Cache the public directory for faster uploads
