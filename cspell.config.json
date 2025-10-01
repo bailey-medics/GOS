@@ -19,6 +19,7 @@
     "grpcurl",
     "makedirs",
     "MSVC",
+    "MSRV",
     "noncommercially",
     "O_RDONLY",
     "PGPASSWORD",
