@@ -4,7 +4,7 @@ repos:
     rev: v8.13.0   # use a stable tag
     hooks:
       - id: cspell
-        args: ["--no-progress", "--no-summary", "--config", "cspell.config.json", "."]
+        args: ["--no-progress", "--config", "cspell.config.json"]
 
   # cargo fmt (formatting check)
   - repo: local
