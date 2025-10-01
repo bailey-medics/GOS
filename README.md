@@ -2,6 +2,26 @@
 
 A play with GitEHR openEHR in server form - using rust only
 
+install rust locally if you want to test on local machine
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+start a new terminal to be able to use rust
+
+Install protobuf compiler
+
+```bash
+brew install protobuf
+```
+
+Build
+
+```bash
+cargo build
+```
+
 ## Time trial
 
 ```bash
