@@ -1,14 +1,17 @@
 {
   "version": "0.2",
   "language": "en-GB",
-  "ignorePaths": ["Cargo.lock", "target/**"],
+  "ignorePaths": [
+    "Cargo.lock",
+    "target/**"
+  ],
   "words": [
     "analyzer",
     "bigserial",
     "cfgs",
     "clippy",
-    "compile_protos",
     "color",
+    "compile_protos",
     "createuser",
     "defenses",
     "docsrs",
@@ -18,9 +21,10 @@
     "gitrepo",
     "grpcurl",
     "makedirs",
-    "MSVC",
     "MSRV",
+    "MSVC",
     "noncommercially",
+    "nonmain",
     "O_RDONLY",
     "PGPASSWORD",
     "PGURL",
@@ -38,5 +42,7 @@
     "tlsv",
     "Tunables"
   ],
-  "ignoreWords": ["Exampletown"]
+  "ignoreWords": [
+    "Exampletown"
+  ]
 }
