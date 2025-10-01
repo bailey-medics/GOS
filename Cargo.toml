@@ -5,6 +5,23 @@ edition = "2021"
 description = "GOS - gRPC Health Service"
 license = "MIT"
 repository = "https://github.com/bailey-medics/GOS"
+keywords = ["grpc", "health", "microservice", "monitoring"]
+categories = ["web-programming", "network-programming"]
+documentation = "https://bailey-medics.github.io/GOS/"
+homepage = "https://github.com/bailey-medics/GOS"
+readme = "README.md"
+
+# Library target (for documentation and reusability)
+[lib]
+name = "gos"
+path = "src/lib.rs"
+doc = true
+
+# Binary target (the actual server)
+[[bin]]
+name = "gos"
+path = "src/main.rs"
+doc = false
 
 [dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }

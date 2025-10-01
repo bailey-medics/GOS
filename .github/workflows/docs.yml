@@ -31,17 +31,79 @@ jobs:
 
       - name: Build docs for gos only (no deps)
         env:
-          RUSTDOCFLAGS: "-Dwarnings --cfg docsrs"
+          RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
         run: |
-          cargo doc --no-deps --all-features --package gos
+          # Create custom doc header for better styling
+          cat > doc-header.html <<'HTML'
+          <style>
+          .rustdoc-toggle > summary {
+            font-weight: 600;
+          }
+          .search-input {
+            border-radius: 6px;
+          }
+          </style>
+          HTML
+          
+          cargo doc --no-deps --all-features --package gos --lib
           mkdir -p public
           cp -r target/doc/* public/
+          
+          # Create a better landing page
           cat > public/index.html <<'HTML'
           <!doctype html>
-          <meta charset="utf-8">
-          <meta http-equiv="refresh" content="0; url=gos/">
-          <title>gos docs</title>
-          <p>Redirecting to <a href="gos/">gos/</a>…</p>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="refresh" content="0; url=gos/">
+            <title>GOS Documentation</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                margin: 0;
+                padding: 40px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+              }
+              .container {
+                text-align: center;
+                background: rgba(255,255,255,0.1);
+                padding: 60px;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+              }
+              h1 { font-size: 3em; margin-bottom: 20px; }
+              p { font-size: 1.2em; margin-bottom: 30px; }
+              a {
+                color: white;
+                text-decoration: none;
+                background: rgba(255,255,255,0.2);
+                padding: 15px 30px;
+                border-radius: 50px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                display: inline-block;
+              }
+              a:hover {
+                background: rgba(255,255,255,0.3);
+                transform: translateY(-2px);
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>🦀 GOS Documentation</h1>
+              <p>gRPC Health Service - Fast, Reliable, Production Ready</p>
+              <a href="gos/">Enter Documentation →</a>
+            </div>
+          </body>
+          </html>
           HTML
 
       - uses: actions/configure-pages@v5

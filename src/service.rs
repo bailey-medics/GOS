@@ -1,7 +1,3 @@
-//! Service implementation for the GOS gRPC health check service.
-//!
-//! This module contains the core service logic for handling health check requests.
-
 use tonic::{Request, Response, Status};
 
 /// Generated protobuf code for the GOS service.

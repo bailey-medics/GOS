@@ -1,16 +1,13 @@
-//! # GOS - gRPC Health Service
+//! Binary entry point for the GOS gRPC health service.
 //!
-//! This crate provides a simple gRPC health check service implementation.
-//! It exposes a health endpoint that can be used for service monitoring
-//! and readiness checks in distributed systems.
+//! This binary starts the gRPC server using the [`gos`] library.
+//! For library documentation and API reference, see the main [`gos`] crate.
 
 use std::net::SocketAddr;
 use tonic::transport::Server;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-mod service;
-use service::pb::gos_server::GosServer;
-use service::GosService;
+use gos::{pb::gos_server::GosServer, GosService};
 
 /// Entry point for the GOS gRPC server.
 ///
