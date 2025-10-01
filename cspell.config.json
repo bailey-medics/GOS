@@ -1,0 +1,29 @@
+{
+  "version": "0.2",
+  "language": "en-GB",
+  "ignorePaths": ["Cargo.lock", "target/**"],
+  "words": [
+    "bigserial",
+    "clippy",
+    "compile_protos",
+    "createuser",
+    "defenses",
+    "favor",
+    "gitrepo",
+    "grpcurl",
+    "makedirs",
+    "MSVC",
+    "noncommercially",
+    "O_RDONLY",
+    "PGPASSWORD",
+    "PGURL",
+    "prost",
+    "psql",
+    "psql_ok",
+    "rustc",
+    "timestamptz",
+    "tlsv",
+    "Tunables"
+  ],
+  "ignoreWords": ["Exampletown"]
+}

@@ -2,6 +2,12 @@
 
 A play with GitEHR openEHR in server form - using rust only
 
+Install pre-commit hooks
+
+```bash
+pre-commit install
+```
+
 install rust locally if you want to test on local machine
 
 ```bash

@@ -1,5 +1,5 @@
 # ---- Build stage ----
-FROM rust:1-bookworm AS builder
+FROM 1-slim-bookworm AS builder
 WORKDIR /app
 
 # cache deps
