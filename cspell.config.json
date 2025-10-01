@@ -22,6 +22,7 @@
     "PGPASSWORD",
     "PGURL",
     "prost",
+    "protoc",
     "psql",
     "psql_ok",
     "rustc",
