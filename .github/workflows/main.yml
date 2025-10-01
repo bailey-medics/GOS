@@ -39,13 +39,13 @@ jobs:
       - name: Install protoc
         if: steps.cache-protoc.outputs.cache-hit != 'true'
         run: |
-          echo "📥 Installing protoc (not found in cache)..."
+          echo "Installing protoc (not found in cache)..."
           mkdir -p ~/protoc
           cd ~/protoc
           curl -L https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip -o protoc.zip
           unzip protoc.zip
           chmod +x bin/protoc
-          echo "✅ protoc installed to ~/protoc/bin/protoc"
+          echo "protoc installed to ~/protoc/bin/protoc"
           
       # Add protoc to PATH
       - name: Setup protoc PATH
@@ -79,7 +79,7 @@ jobs:
       # Show cache status for debugging
       - name: Show cache status
         run: |
-          echo "🗂️ Cache Status Report:"
+          echo "Cache Status Report:"
           echo "Protoc cache hit: ${{ steps.cache-protoc.outputs.cache-hit }}"
           echo "Protoc version: $(protoc --version 2>/dev/null || echo 'not found')"
           echo "Protoc location: $(which protoc 2>/dev/null || echo 'not in PATH')"
@@ -92,7 +92,7 @@ jobs:
           CARGO_INCREMENTAL: "0"  # Disable incremental compilation for better caching
           CARGO_NET_RETRY: "10"   # Retry network requests
         run: |
-          echo "⏱️ Starting documentation build at $(date)"
+          echo "Starting documentation build at $(date)"
           start_time=$(date +%s)
           
           # Create custom doc header for better styling
@@ -108,17 +108,17 @@ jobs:
           HTML
           
           # Build with optimized flags for documentation
-          echo "🔨 Building documentation..."
+          echo "Building documentation..."
           echo "Using protoc: $(which protoc) ($(protoc --version))"
           cargo doc --no-deps --all-features --package gos --lib --jobs 2
           
           end_time=$(date +%s)
           duration=$((end_time - start_time))
-          echo "✅ Documentation build completed in ${duration} seconds"
+          echo "Documentation build completed in ${duration} seconds"
           
           # Show build cache effectiveness
           if [ -d "target/doc" ]; then
-            echo "📊 Generated documentation: $(du -sh target/doc | cut -f1)"
+            echo "Generated documentation: $(du -sh target/doc | cut -f1)"
           fi
           
           mkdir -p public
@@ -126,14 +126,17 @@ jobs:
           # Copy all documentation files
           cp -r target/doc/* public/
           
+          # Copy our custom index.html that redirects to the documentation
+          cp index.html public/
+          
           # Move the gos documentation to the root level
           if [ -d "public/gos" ]; then
             # Copy gos content to root, then clean up
             cp -r public/gos/* public/
             # Keep the gos directory for any remaining references
-            echo "✅ GOS documentation moved to root level"
+            echo "GOS documentation moved to root level"
           else
-            echo "❌ Warning: gos directory not found in documentation"
+            echo "Warning: gos directory not found in documentation"
           fi
 
       # Cache the public directory for faster uploads
