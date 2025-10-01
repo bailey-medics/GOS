@@ -1,3 +1,9 @@
+//! # GOS - gRPC Health Service
+//!
+//! This crate provides a simple gRPC health check service implementation.
+//! It exposes a health endpoint that can be used for service monitoring
+//! and readiness checks in distributed systems.
+
 use std::net::SocketAddr;
 use tonic::transport::Server;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -6,12 +12,28 @@ mod service;
 use service::pb::gos_server::GosServer;
 use service::GosService;
 
+/// Entry point for the GOS gRPC server.
+///
+/// Sets up structured logging with tracing, parses the listen address from
+/// the `GOS_ADDR` environment variable (defaults to `0.0.0.0:50051`),
+/// and starts the gRPC server with the health service.
+///
+/// # Environment Variables
+///
+/// * `GOS_ADDR` - The address to bind the server to (optional, defaults to `0.0.0.0:50051`)
+/// * `RUST_LOG` - Controls log level (optional, defaults to `gos=info`)
+///
+/// # Errors
+///
+/// Returns an error if:
+/// * The address parsing fails
+/// * The server fails to start
+/// * Logging configuration is invalid
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     // logging
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::from_default_env()
-            .add_directive("gos=info".parse()?))
+        .with(tracing_subscriber::EnvFilter::from_default_env().add_directive("gos=info".parse()?))
         .with(tracing_subscriber::fmt::layer())
         .init();
 
@@ -22,7 +44,7 @@ async fn main() -> anyhow::Result<()> {
 
     tracing::info!("Starting GOS gRPC on {}", addr);
 
-    let svc = GosService::default();
+    let svc = GosService;
     Server::builder()
         .add_service(GosServer::new(svc))
         .serve(addr)
