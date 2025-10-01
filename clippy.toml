@@ -1,0 +1,16 @@
+# Clippy configuration
+# See: https://doc.rust-lang.org/clippy/configuration.html
+
+# Cognitive complexity threshold
+cognitive-complexity-threshold = 30
+
+# Performance lints
+vec-box-size-threshold = 4096
+
+# Style preferences  
+trivial-copy-size-limit = 128
+
+# Allow certain patterns that are common in async code
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true

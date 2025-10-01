@@ -2,6 +2,9 @@
 name = "gos"
 version = "0.1.0"
 edition = "2021"
+description = "GOS - gRPC Health Service"
+license = "MIT"
+repository = "https://github.com/bailey-medics/GOS"
 
 [dependencies]
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
@@ -15,3 +18,9 @@ anyhow = "1"
 [build-dependencies]
 tonic-build = "0.12"
 prost-build = "0.13"
+
+# Custom cargo commands for development
+[package.metadata.commands]
+fmt = "cargo fmt --all"
+lint = "cargo clippy --all-targets --all-features -- -D warnings"
+check-all = "./scripts/check-all.sh"

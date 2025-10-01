@@ -3,6 +3,7 @@
   "language": "en-GB",
   "ignorePaths": ["Cargo.lock", "target/**"],
   "words": [
+    "analyzer",
     "bigserial",
     "cfgs",
     "clippy",

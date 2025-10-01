@@ -9,19 +9,51 @@ repos:
   # cargo fmt (formatting check)
   - repo: local
     hooks:
-      - id: cargo-fmt
-        name: cargo fmt
-        entry: bash -c 'source ~/.cargo/env && cargo fmt -- --check'
+      - id: cargo-fmt-check
+        name: cargo fmt (check)
+        entry: bash -c 'source ~/.cargo/env && cargo fmt --all -- --check'
         language: system
         types: [rust]
         pass_filenames: false
+
+  # cargo fmt (auto-fix)
+  - repo: local
+    hooks:
+      - id: cargo-fmt-fix
+        name: cargo fmt (fix)
+        entry: bash -c 'source ~/.cargo/env && cargo fmt --all'
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [manual]
 
   # cargo clippy (linting)
   - repo: local
     hooks:
       - id: cargo-clippy
         name: cargo clippy
-        entry: bash -c 'source ~/.cargo/env && cargo clippy -- -D warnings'
+        entry: bash -c 'source ~/.cargo/env && cargo clippy --all-targets --all-features -- -D warnings'
         language: system
         types: [rust]
         pass_filenames: false
+
+  # cargo check (compilation check)
+  - repo: local
+    hooks:
+      - id: cargo-check
+        name: cargo check
+        entry: bash -c 'source ~/.cargo/env && cargo check --all-targets --all-features'
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+  # cargo test (run tests)
+  - repo: local
+    hooks:
+      - id: cargo-test
+        name: cargo test
+        entry: bash -c 'source ~/.cargo/env && cargo test --all-features'
+        language: system
+        types: [rust]
+        pass_filenames: false
+        stages: [manual]
