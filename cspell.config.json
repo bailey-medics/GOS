@@ -1,10 +1,7 @@
 {
   "version": "0.2",
   "language": "en-GB",
-  "ignorePaths": [
-    "Cargo.lock",
-    "target/**"
-  ],
+  "ignorePaths": ["Cargo.lock", "target/**"],
   "words": [
     "analyzer",
     "bigserial",
@@ -17,6 +14,7 @@
     "docsrs",
     "dtolnay",
     "Dwarnings",
+    "euxo",
     "favor",
     "gitrepo",
     "grpcurl",
@@ -28,6 +26,7 @@
     "O_RDONLY",
     "PGPASSWORD",
     "PGURL",
+    "pipefail",
     "prost",
     "protoc",
     "psql",
@@ -42,7 +41,5 @@
     "tlsv",
     "Tunables"
   ],
-  "ignoreWords": [
-    "Exampletown"
-  ]
+  "ignoreWords": ["Exampletown"]
 }

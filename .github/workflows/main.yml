@@ -3,9 +3,9 @@ name: Main branch workflows
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: {}
   pull_request:
     branches: [ main ]
+  workflow_dispatch: {}
   workflow_run:
     workflows: ["Non-main branch workflows"]
     types: [completed]
@@ -22,7 +22,6 @@ concurrency:
 env:
   CARGO_TERM_COLOR: always
 
-# .github/workflows/docs.yml (snippet)
 jobs:
   build-and-deploy-docs:
     runs-on: ubuntu-latest
@@ -30,7 +29,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
 
-      # Cache protoc installation
+      # ---------- protoc cache/install (for prost-build etc.) ----------
       - name: Cache protoc
         id: cache-protoc
         uses: actions/cache@v4
@@ -40,26 +39,23 @@ jobs:
           restore-keys: |
             protoc-${{ runner.os }}-
 
-      # Install protoc only if not cached
       - name: Install protoc
         if: steps.cache-protoc.outputs.cache-hit != 'true'
         run: |
-          echo "Installing protoc (not found in cache)..."
+          set -euxo pipefail
           mkdir -p ~/protoc
           cd ~/protoc
           curl -L https://github.com/protocolbuffers/protobuf/releases/download/v25.1/protoc-25.1-linux-x86_64.zip -o protoc.zip
-          unzip protoc.zip
+          unzip -q protoc.zip
           chmod +x bin/protoc
-          echo "protoc installed to ~/protoc/bin/protoc"
-          
-      # Add protoc to PATH
+
       - name: Setup protoc PATH
         run: |
           echo "$HOME/protoc/bin" >> $GITHUB_PATH
           echo "PROTOC=$HOME/protoc/bin/protoc" >> $GITHUB_ENV
 
-      # Cache Rust dependencies and build artifacts
-      - name: Cache Rust dependencies
+      # ---------- Rust caches ----------
+      - name: Cache Rust
         uses: actions/cache@v4
         with:
           path: |
@@ -72,92 +68,36 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      # Cache generated documentation
-      - name: Cache doc artifacts
-        uses: actions/cache@v4
-        with:
-          path: target/doc
-          key: ${{ runner.os }}-docs-${{ hashFiles('src/**/*.rs', 'Cargo.toml', 'build.rs', 'proto/**/*.proto') }}
-          restore-keys: |
-            ${{ runner.os }}-docs-
-
-      # Show cache status for debugging
-      - name: Show cache status
-        run: |
-          echo "Cache Status Report:"
-          echo "Protoc cache hit: ${{ steps.cache-protoc.outputs.cache-hit }}"
-          echo "Protoc version: $(protoc --version 2>/dev/null || echo 'not found')"
-          echo "Protoc location: $(which protoc 2>/dev/null || echo 'not in PATH')"
-          echo "Cargo cache: $(ls -la ~/.cargo/bin/ 2>/dev/null | wc -l || echo '0') cached binaries"
-          echo "Build cache: $(ls -la target/ 2>/dev/null | wc -l || echo '0') cached artifacts"
-
-      - name: Build docs for gos only (no deps)
+      # ---------- Build docs for crate only ----------
+      - name: Build docs (crate only, no deps)
         env:
           RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
-          CARGO_INCREMENTAL: "0"  # Disable incremental compilation for better caching
-          CARGO_NET_RETRY: "10"   # Retry network requests
+          CARGO_INCREMENTAL: "0"
+          CARGO_NET_RETRY: "10"
         run: |
-          echo "Starting documentation build at $(date)"
-          start_time=$(date +%s)
-          
-          # Create custom doc header for better styling
+          set -euxo pipefail
+          # Small tweak to rustdoc styling (optional)
           cat > doc-header.html <<'HTML'
           <style>
-          .rustdoc-toggle > summary {
-            font-weight: 600;
-          }
-          .search-input {
-            border-radius: 6px;
-          }
+            .rustdoc-toggle > summary { font-weight: 600; }
+            .search-input { border-radius: 6px; }
           </style>
           HTML
-          
-          # Build with optimized flags for documentation
-          echo "Building documentation..."
+
           echo "Using protoc: $(which protoc) ($(protoc --version))"
+          # Build only your crate's docs so rustdoc doesn't emit the multi-crate index
           cargo doc --no-deps --all-features --package gos --lib --jobs 2
-          
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          echo "Documentation build completed in ${duration} seconds"
-          
-          # Show build cache effectiveness
-          if [ -d "target/doc" ]; then
-            echo "Generated documentation: $(du -sh target/doc | cut -f1)"
-          fi
-          
-          mkdir -p public
-          
-          # Copy all documentation files
-          cp -r target/doc/* public/
-          
-          # Copy our custom index.html that redirects to the documentation
-          cp index.html public/
-          
-          # Move the gos documentation to the root level
-          if [ -d "public/gos" ]; then
-            # Copy gos content to root, then clean up
-            cp -r public/gos/* public/
-            # Keep the gos directory for any remaining references
-            echo "GOS documentation moved to root level"
-          else
-            echo "Warning: gos directory not found in documentation"
-          fi
 
-      # Cache the public directory for faster uploads
-      - name: Cache public directory
-        uses: actions/cache@v4
-        with:
-          path: public
-          key: ${{ runner.os }}-public-${{ hashFiles('public/**/*') }}
-          restore-keys: |
-            ${{ runner.os }}-public-
+          # Sanity-check the generated path
+          test -f target/doc/gos/index.html
 
+      # ---------- Deploy exactly target/doc/gos as the site root ----------
       - uses: actions/configure-pages@v5
+
       - uses: actions/upload-pages-artifact@v3
-        with: 
-          path: public
-          retention-days: 7  # Reduce storage costs
+        with:
+          path: target/doc/gos
+
   deploy:
     needs: build-and-deploy-docs
     runs-on: ubuntu-latest
