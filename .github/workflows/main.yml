@@ -76,7 +76,6 @@ jobs:
           CARGO_NET_RETRY: "10"
         run: |
           set -euxo pipefail
-
           # Optional tiny style tweak
           cat > doc-header.html <<'HTML'
           <style>
@@ -87,18 +86,18 @@ jobs:
 
           echo "Using protoc: $(which protoc) ($(protoc --version || true))"
           cargo doc --no-deps --all-features --package gos --lib --jobs 2
-
-          # Sanity check
           test -f target/doc/gos/index.html
 
       # ---------- Re-root crate docs to site root (no redirect) ----------
       - name: Stage docs for Pages (copy assets + rewrite paths)
+        shell: bash
         run: |
           set -euxo pipefail
+
           rm -rf public
           mkdir -p public
 
-          # 1) Copy the crate pages (which reference ../ for assets)
+          # 1) Copy the crate pages
           cp -R target/doc/gos/* public/
 
           # 2) Copy shared rustdoc assets that normally live one level up
@@ -112,6 +111,29 @@ jobs:
             fi
           done
 
-          # 3) Rewrite asset paths from ../ to ./ across all HTML
-          #    (so files work when gos/ is promoted to the root)
-          find public -type f -name "*.html" -print0 | xargs -0 sed -i \
+          # 3) Rewrite asset paths from ../ to ./ in every HTML file
+          #    Use a loop for portability across GNU/BSD sed.
+          while IFS= read -r -d '' f; do
+            sed -i.bak 's|href="\.\./|href="./|g; s|src="\.\./|src="./|g' "$f"
+            rm -f "$f.bak"
+          done < <(find public -type f -name '*.html' -print0)
+
+          # Sanity: ensure CSS is present so we won't render unstyled
+          ls -1 public/*.css >/dev/null
+
+      # ---------- Deploy ----------
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build-and-deploy-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
