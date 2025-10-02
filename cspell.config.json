@@ -23,6 +23,7 @@
     "MSVC",
     "noncommercially",
     "nonmain",
+    "nullglob",
     "O_RDONLY",
     "PGPASSWORD",
     "PGURL",
@@ -37,6 +38,7 @@
     "rustdoc",
     "RUSTDOCFLAGS",
     "Segoe",
+    "shopt",
     "timestamptz",
     "tlsv",
     "Tunables"
