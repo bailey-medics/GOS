@@ -12,7 +12,6 @@ RUN cargo install cargo-watch
 # the per-crate Cargo.toml files so cargo can resolve dependencies.
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates/
-COPY proto proto
 
 # Create minimal dummy source for the crates so we can cache dependencies by
 # building the api package. The real source will be mounted during development.

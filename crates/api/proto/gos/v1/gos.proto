@@ -5,6 +5,28 @@ import "google/protobuf/empty.proto";
 
 message HealthRes { bool ok = 1; string message = 2; }
 
+message CreatePatientReq {
+  string first_name = 1;
+  string last_name = 2;
+}
+
+message Patient {
+  string id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string created_at = 4; // RFC3339
+}
+
+message CreatePatientRes {
+  string filename = 1; // path of created JSON file
+  Patient patient = 2;
+}
+
 service GOS {
   rpc Health(google.protobuf.Empty) returns (HealthRes);
+  rpc CreatePatient(CreatePatientReq) returns (CreatePatientRes);
 }
+
+
+// Duplicate proto removed. Use repo-level `proto/gos/v1/gos.proto` as the
+// canonical source of truth.

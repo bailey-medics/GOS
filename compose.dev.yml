@@ -23,6 +23,7 @@ services:
       
       # Mount logs directory (optional)
       - ./logs:/home/gos/logs
+      - ./patient_data:/patient_data
     networks:
       - gos-network
     restart: unless-stopped
