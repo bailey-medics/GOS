@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  gos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gos-dev
+    ports:
+      - "50051:50051"
+    environment:
+      - GOS_ADDR=0.0.0.0:50051
+      - RUST_LOG=gos=debug,info
+    volumes:
+      # Mount source for development (for live reload)
+      - ./src:/app/src:ro
+      - ./proto:/app/proto:ro
+      
+      # Preserve target directory to cache compiled dependencies
+      - cargo-cache:/app/target
+      
+      # Mount logs directory (optional)
+      - ./logs:/home/gos/logs
+    networks:
+      - gos-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "grpcurl -plaintext localhost:50051 list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Optional: Add a gRPC client tool for testing
+  grpcurl:
+    image: fullstorydev/grpcurl:latest
+    container_name: gos-grpcurl
+    networks:
+      - gos-network
+    depends_on:
+      - gos
+    profiles:
+      - tools
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        echo "gRPC testing tool ready. Use:"
+        echo "docker compose -f compose.dev.yml exec grpcurl grpcurl -plaintext gos:50051 list"
+        sleep infinity
+
+networks:
+  gos-network:
+    driver: bridge
+
+volumes:
+  cargo-cache:
+    driver: local
+  gos-logs:
+    driver: local
