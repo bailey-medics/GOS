@@ -1,4 +1,4 @@
-#![doc = include_str!("../index.md")]
+#![doc = include_str!("index.md")]
 #![doc(html_playground_url = "https://play.rust-lang.org/")]
 #![doc(html_logo_url = "https://www.rust-lang.org/logos/rust-logo-128x128-blk.png")]
 #![doc(html_favicon_url = "https://www.rust-lang.org/favicon.ico")]
