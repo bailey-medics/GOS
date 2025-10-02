@@ -1,0 +1,29 @@
+[package]
+name = "gos"
+version = "0.1.0"
+edition = "2021"
+description = "GOS - gRPC Health Service"
+license = "MIT"
+repository = "https://github.com/bailey-medics/GOS"
+readme = "README.md"
+
+[lib]
+name = "gos"
+path = "src/lib.rs"
+
+[[bin]]
+name = "gos"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tonic = { version = "0.12", features = ["transport"] }
+prost = "0.13"
+prost-types = "0.13"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1"
+
+[build-dependencies]
+tonic-build = "0.12"
+prost-build = "0.13"
