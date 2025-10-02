@@ -1,43 +1,6 @@
-[package]
-name = "gos"
-version = "0.1.0"
-edition = "2021"
-description = "GOS - gRPC Health Service"
-license = "MIT"
-repository = "https://github.com/bailey-medics/GOS"
-keywords = ["grpc", "health", "microservice", "monitoring"]
-categories = ["web-programming", "network-programming"]
-documentation = "https://bailey-medics.github.io/GOS/"
-homepage = "https://github.com/bailey-medics/GOS"
-readme = "README.md"
-
-# Library target (for documentation and reusability)
-[lib]
-name = "gos"
-path = "src/lib.rs"
-doc = true
-
-# Binary target (the actual server)
-[[bin]]
-name = "gos"
-path = "src/main.rs"
-doc = false
-
-[dependencies]
-tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
-tonic = { version = "0.12", features = ["transport"] }
-prost = "0.13"
-prost-types = "0.13"
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-anyhow = "1"
-
-[build-dependencies]
-tonic-build = "0.12"
-prost-build = "0.13"
-
-# Custom cargo commands for development
-[package.metadata.commands]
-fmt = "cargo fmt --all"
-lint = "cargo clippy --all-targets --all-features -- -D warnings"
-check-all = "./scripts/check-all.sh"
+[workspace]
+members = [
+	"crates/api",
+	"crates/gos",
+]
+resolver = "2"

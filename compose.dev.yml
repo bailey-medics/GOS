@@ -13,17 +13,21 @@ services:
       - RUST_LOG=gos=debug,info
     volumes:
       # Mount source for development (for live reload)
-      - ./src:/app/src:ro
+      # Mount the repository so cargo-watch sees the workspace
+      - ./:/app:delegated
+      # Ensure protos are available (repo-root proto is used by both crates)
       - ./proto:/app/proto:ro
       
       # Preserve target directory to cache compiled dependencies
-      - cargo-cache:/app/target
+      - "cargo-cache:/app/target"
       
       # Mount logs directory (optional)
       - ./logs:/home/gos/logs
     networks:
       - gos-network
     restart: unless-stopped
+    # Ensure cargo runs the api binary explicitly (workspace has two binaries)
+    command: ["/bin/sh", "-c", "cargo watch -x 'run -p api --bin gos-api'"]
     healthcheck:
       test: ["CMD-SHELL", "grpcurl -plaintext localhost:50051 list || exit 1"]
       interval: 30s

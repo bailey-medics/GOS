@@ -1,10 +1,7 @@
 {
   "version": "0.2",
   "language": "en-GB",
-  "ignorePaths": [
-    "Cargo.lock",
-    "target/**"
-  ],
+  "ignorePaths": ["Cargo.lock", "target/**"],
   "words": [
     "analyzer",
     "bigserial",
@@ -24,6 +21,7 @@
     "gitrepo",
     "grpcurl",
     "healthcheck",
+    "libapi",
     "libgos",
     "makedirs",
     "MSRV",
@@ -39,6 +37,7 @@
     "pipefail",
     "prost",
     "protoc",
+    "protos",
     "psql",
     "psql_ok",
     "rgba",
@@ -52,7 +51,5 @@
     "tlsv",
     "Tunables"
   ],
-  "ignoreWords": [
-    "Exampletown"
-  ]
+  "ignoreWords": ["Exampletown"]
 }

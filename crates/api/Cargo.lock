@@ -33,21 +33,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a23eb6b1614318a8071c9b2521f36b424b2c83db5eb3a0fead4a6c0809af6e61"
 
 [[package]]
-name = "api"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "prost",
- "prost-build",
- "prost-types",
- "tokio",
- "tonic",
- "tonic-build",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "async-stream"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -287,7 +272,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
-name = "gos"
+name = "gos-api"
 version = "0.1.0"
 dependencies = [
  "anyhow",

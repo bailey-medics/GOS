@@ -7,14 +7,24 @@ RUN apk add --no-cache musl-dev gcc protobuf-dev
 # Install cargo-watch for hot reloading
 RUN cargo install cargo-watch
 
-# Copy dependency files for initial caching (without source)
-COPY Cargo.toml Cargo.lock build.rs ./
+# Copy dependency files for initial caching (without full source)
+# We don't copy build.rs (it moved into crates/gos); copy workspace manifest and
+# the per-crate Cargo.toml files so cargo can resolve dependencies.
+COPY Cargo.toml Cargo.lock ./
+COPY crates ./crates/
 COPY proto proto
 
-# Create minimal dummy source just to cache dependencies
-RUN mkdir -p src && echo 'fn main(){}' > src/main.rs && echo 'pub fn dummy() {}' > src/lib.rs
-RUN cargo build --release
-RUN rm -rf target/release/deps/gos* target/release/gos target/release/libgos*
+# Create minimal dummy source for the crates so we can cache dependencies by
+# building the api package. The real source will be mounted during development.
+RUN mkdir -p crates/api/src crates/gos/src \
+ && echo 'fn main(){}' > crates/api/src/main.rs \
+ && echo 'pub fn dummy() {}' > crates/api/src/lib.rs \
+ && echo 'fn main(){}' > crates/gos/src/main.rs \
+ && echo 'pub fn dummy() {}' > crates/gos/src/lib.rs
+
+# Build only the api package to prime the dependency cache
+RUN cargo build --release -p api
+RUN rm -rf target/release/deps/api* target/release/api target/release/libapi*
 
 # Don't copy real source - it will be mounted as volume
 
