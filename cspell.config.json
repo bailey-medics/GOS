@@ -1,7 +1,10 @@
 {
   "version": "0.2",
   "language": "en-GB",
-  "ignorePaths": ["Cargo.lock", "target/**"],
+  "ignorePaths": [
+    "Cargo.lock",
+    "target/**"
+  ],
   "words": [
     "analyzer",
     "bigserial",
@@ -21,8 +24,10 @@
     "makedirs",
     "MSRV",
     "MSVC",
+    "noindex",
     "noncommercially",
     "nonmain",
+    "noscript",
     "nullglob",
     "O_RDONLY",
     "PGPASSWORD",
@@ -43,5 +48,7 @@
     "tlsv",
     "Tunables"
   ],
-  "ignoreWords": ["Exampletown"]
+  "ignoreWords": [
+    "Exampletown"
+  ]
 }
