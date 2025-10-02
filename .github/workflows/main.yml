@@ -85,7 +85,7 @@ jobs:
           HTML
 
           echo "Using protoc: $(which protoc) ($(protoc --version || true))"
-          cargo doc --no-deps --all-features --package gos --lib --jobs 2
+          cargo doc --no-deps --all-features --lib --bins --document-private-items --jobs 2
           test -f target/doc/gos/index.html
 
           # Replace the root index with a tiny forwarder to ./gos/
