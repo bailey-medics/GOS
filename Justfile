@@ -34,6 +34,14 @@ abbreviate-just:
     echo "source ~/.zshrc"
 
 
+alias d := docs
+# Generate the documentation
+docs:
+    #!/usr/bin/env bash
+    {{initialise}} "docs"
+    cargo doc --no-deps --workspace --open
+
+
 alias eb := enter-backend
 # Enter the backend container shell
 enter-backend:
