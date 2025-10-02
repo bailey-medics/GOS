@@ -68,7 +68,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      # ---------- Build docs for crate only ----------
+      # ---------- Build docs (crate only) ----------
       - name: Build docs (crate only, no deps)
         env:
           RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
@@ -76,7 +76,8 @@ jobs:
           CARGO_NET_RETRY: "10"
         run: |
           set -euxo pipefail
-          # Small tweak to rustdoc styling (optional)
+
+          # Optional tiny style tweak
           cat > doc-header.html <<'HTML'
           <style>
             .rustdoc-toggle > summary { font-weight: 600; }
@@ -84,26 +85,33 @@ jobs:
           </style>
           HTML
 
-          echo "Using protoc: $(which protoc) ($(protoc --version))"
-          # Build only your crate's docs so rustdoc doesn't emit the multi-crate index
+          echo "Using protoc: $(which protoc) ($(protoc --version || true))"
           cargo doc --no-deps --all-features --package gos --lib --jobs 2
 
-          # Sanity-check the generated path
+          # Sanity check
           test -f target/doc/gos/index.html
 
-      # ---------- Deploy exactly target/doc/gos as the site root ----------
-      - uses: actions/configure-pages@v5
+      # ---------- Re-root crate docs to site root (no redirect) ----------
+      - name: Stage docs for Pages (copy assets + rewrite paths)
+        run: |
+          set -euxo pipefail
+          rm -rf public
+          mkdir -p public
 
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: target/doc/gos
+          # 1) Copy the crate pages (which reference ../ for assets)
+          cp -R target/doc/gos/* public/
 
-  deploy:
-    needs: build-and-deploy-docs
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          # 2) Copy shared rustdoc assets that normally live one level up
+          shopt -s nullglob
+          for p in target/doc/*.css target/doc/*.js target/doc/*.html; do
+            cp "$p" public/
+          done
+          for d in src theme static.files; do
+            if [ -d "target/doc/$d" ]; then
+              cp -R "target/doc/$d" public/
+            fi
+          done
+
+          # 3) Rewrite asset paths from ../ to ./ across all HTML
+          #    (so files work when gos/ is promoted to the root)
+          find public -type f -name "*.html" -print0 | xargs -0 sed -i \
