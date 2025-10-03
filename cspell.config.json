@@ -21,8 +21,10 @@
     "getifaddr",
     "gitehr",
     "gitrepo",
+    "grpcui",
     "grpcurl",
     "healthcheck",
+    "Justfile",
     "libapi",
     "libgos",
     "makedirs",
@@ -64,6 +66,10 @@
     {
       "languageId": "markdown",
       "includeRegExpList": [".*"]
+    },
+    {
+      "languageId": "just",
+      "includeRegExpList": ["string", "comment"]
     }
   ]
 }
