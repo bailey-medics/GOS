@@ -88,4 +88,50 @@ impl Gos for GosService {
 
         Ok(Response::new(resp))
     }
+
+    async fn list_patients(
+        &self,
+        _req: Request<()>,
+    ) -> Result<Response<pb::ListPatientsRes>, Status> {
+        let base = std::env::var("PATIENT_DATA_DIR").unwrap_or_else(|_| "/patient_data".into());
+        let data_dir = Path::new(&base).join("patients");
+
+        let mut patients = Vec::new();
+
+        let read_dir = match fs::read_dir(&data_dir) {
+            Ok(rd) => rd,
+            Err(_) => {
+                // No patients directory yet; return empty list
+                return Ok(Response::new(pb::ListPatientsRes { patients }));
+            }
+        };
+
+        for entry in read_dir.flatten() {
+            let path = entry.path();
+            if path.is_file() {
+                if let Ok(contents) = fs::read_to_string(&path) {
+                    #[derive(serde::Deserialize)]
+                    struct StoredPatient {
+                        id: String,
+                        first_name: String,
+                        last_name: String,
+                        created_at: String,
+                    }
+
+                    if let Ok(sp) = serde_json::from_str::<StoredPatient>(&contents) {
+                        patients.push(Patient {
+                            id: sp.id,
+                            first_name: sp.first_name,
+                            last_name: sp.last_name,
+                            created_at: sp.created_at,
+                        });
+                    } else {
+                        tracing::warn!("failed to deserialize patient file: {}", path.display());
+                    }
+                }
+            }
+        }
+
+        Ok(Response::new(pb::ListPatientsRes { patients }))
+    }
 }

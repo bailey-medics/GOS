@@ -22,7 +22,12 @@ message CreatePatientRes {
   Patient patient = 2;
 }
 
+message ListPatientsRes {
+  repeated Patient patients = 1;
+}
+
 service GOS {
   rpc Health(google.protobuf.Empty) returns (HealthRes);
   rpc CreatePatient(CreatePatientReq) returns (CreatePatientRes);
+  rpc ListPatients(google.protobuf.Empty) returns (ListPatientsRes);
 }

@@ -98,6 +98,84 @@ impl Gos for GosService {
 
         Ok(Response::new(resp))
     }
+
+    async fn list_patients(
+        &self,
+        _req: Request<()>,
+    ) -> Result<Response<pb::ListPatientsRes>, Status> {
+        let base = std::env::var("PATIENT_DATA_DIR").unwrap_or_else(|_| "/patient_data".into());
+        let data_dir = Path::new(&base);
+
+        let mut patients = Vec::new();
+
+        let s1_iter = match fs::read_dir(data_dir) {
+            Ok(it) => it,
+            Err(_) => return Ok(Response::new(pb::ListPatientsRes { patients })),
+        };
+        for s1 in s1_iter.flatten() {
+            let s1_path = s1.path();
+            if !s1_path.is_dir() {
+                continue;
+            }
+
+            let s2_iter = match fs::read_dir(&s1_path) {
+                Ok(it) => it,
+                Err(_) => continue,
+            };
+
+            for s2 in s2_iter.flatten() {
+                let s2_path = s2.path();
+                if !s2_path.is_dir() {
+                    continue;
+                }
+
+                let id_iter = match fs::read_dir(&s2_path) {
+                    Ok(it) => it,
+                    Err(_) => continue,
+                };
+
+                for id_ent in id_iter.flatten() {
+                    let id_path = id_ent.path();
+                    if !id_path.is_dir() {
+                        continue;
+                    }
+
+                    let demo_path = id_path.join("demographics.json");
+                    if !demo_path.is_file() {
+                        continue;
+                    }
+
+                    if let Ok(contents) = fs::read_to_string(&demo_path) {
+                        #[derive(serde::Deserialize)]
+                        struct StoredPatient {
+                            first_name: String,
+                            last_name: String,
+                            created_at: String,
+                        }
+
+                        if let Ok(sp) = serde_json::from_str::<StoredPatient>(&contents) {
+                            let id = id_path
+                                .file_name()
+                                .and_then(|os| os.to_str())
+                                .unwrap_or("")
+                                .to_string();
+
+                            patients.push(Patient {
+                                id,
+                                first_name: sp.first_name,
+                                last_name: sp.last_name,
+                                created_at: sp.created_at,
+                            });
+                        } else {
+                            tracing::warn!("failed to parse demographics: {}", demo_path.display());
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(Response::new(pb::ListPatientsRes { patients }))
+    }
 }
 
 // Re-export the service type for consumers
