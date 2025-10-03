@@ -26,7 +26,3 @@ service GOS {
   rpc Health(google.protobuf.Empty) returns (HealthRes);
   rpc CreatePatient(CreatePatientReq) returns (CreatePatientRes);
 }
-
-
-// Duplicate proto removed. Use repo-level `proto/gos/v1/gos.proto` as the
-// canonical source of truth.

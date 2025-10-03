@@ -50,6 +50,14 @@ enter-backend:
     docker exec -it quill_backend /bin/sh
 
 
+alias g := gui
+# Start the GUI app
+gui:
+    #!/usr/bin/env bash
+    {{initialise}} "gui"
+    grpcui -proto crates/api/proto/gos/v1/gos.proto -plaintext localhost:50051
+
+
 alias pc := pre-commit
 # Run pre-commit checks
 pre-commit:
