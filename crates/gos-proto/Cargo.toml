@@ -1,0 +1,16 @@
+[package]
+name = "gos-proto"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "gos_proto"
+path = "src/lib.rs"
+
+[build-dependencies]
+tonic-build = "0.12"
+prost-build = "0.13"
+
+[dependencies]
+tonic = { version = "0.12" }
+prost = "0.13"

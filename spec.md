@@ -71,3 +71,19 @@ We’re choosing this stack to be as fast as possible while still safe and relia
 - Git stored on fast SSD disks.
 - Postgres and Redis tuned for speed and reliability.
 - Backups: Git repo + Postgres dumps; can be replayed into a new instance.
+
+##  Cargo features
+
+- A feature flag for code builds.
+
+Features needed for a patient to view and edit their own records:
+
+```bash
+cargo build --features patient
+```
+
+Features needed for clinicians and admins to manage records in a multi-patient environment:
+
+```bash
+cargo build --features org
+```
