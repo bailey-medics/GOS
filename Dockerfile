@@ -20,6 +20,8 @@ RUN mkdir -p crates/api/src crates/gos/src \
  && echo 'pub fn dummy() {}' > crates/api/src/lib.rs \
  && echo 'fn main(){}' > crates/gos/src/main.rs \
  && echo 'pub fn dummy() {}' > crates/gos/src/lib.rs
+# Ensure the workspace-level package (gos-run) has a dummy binary while caching
+RUN mkdir -p src && echo 'fn main() {}' > src/main.rs
 
 # Build only the api package to prime the dependency cache
 RUN cargo build --release -p api

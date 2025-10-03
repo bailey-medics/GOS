@@ -1,7 +1,7 @@
 {
   "version": "0.2",
   "language": "en-GB",
-  "ignorePaths": ["Cargo.lock", "target/**"],
+  "ignorePaths": ["Cargo.toml", "Cargo.lock", "target/**"],
   "words": [
     "analyzer",
     "bigserial",
@@ -19,6 +19,7 @@
     "favor",
     "fullstorydev",
     "getifaddr",
+    "gitehr",
     "gitrepo",
     "grpcurl",
     "healthcheck",
@@ -54,5 +55,15 @@
     "tlsv",
     "Tunables"
   ],
-  "ignoreWords": ["Exampletown"]
+  "ignoreWords": ["Exampletown"],
+  "languageSettings": [
+    {
+      "languageId": "rust",
+      "includeRegExpList": ["string", "comment", "doc"]
+    },
+    {
+      "languageId": "markdown",
+      "includeRegExpList": [".*"]
+    }
+  ]
 }

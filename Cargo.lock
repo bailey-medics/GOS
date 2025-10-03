@@ -47,14 +47,14 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
+ "gitehr-temp",
+ "gos-proto",
  "prost",
- "prost-build",
  "prost-types",
  "serde",
  "serde_json",
  "tokio",
  "tonic",
- "tonic-build",
  "tracing",
  "tracing-subscriber",
  "uuid",
@@ -342,6 +342,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
+name = "gitehr-temp"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "gos-proto",
+ "serde",
+ "serde_json",
+ "tonic",
+ "tracing",
+ "uuid",
+]
+
+[[package]]
 name = "gos"
 version = "0.1.0"
 dependencies = [
@@ -358,6 +371,30 @@ dependencies = [
  "tracing",
  "tracing-subscriber",
  "uuid",
+]
+
+[[package]]
+name = "gos-proto"
+version = "0.1.0"
+dependencies = [
+ "prost",
+ "prost-build",
+ "tonic",
+ "tonic-build",
+]
+
+[[package]]
+name = "gos-run"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "api",
+ "prost-build",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
