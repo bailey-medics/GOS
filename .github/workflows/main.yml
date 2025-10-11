@@ -12,8 +12,8 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
+  pages: write        # needed for Pages deploy
+  id-token: write     # needed for OIDC auth
 
 concurrency:
   group: pages
@@ -54,8 +54,8 @@ jobs:
           echo "$HOME/protoc/bin" >> $GITHUB_PATH
           echo "PROTOC=$HOME/protoc/bin/protoc" >> $GITHUB_ENV
 
-      # ---------- Rust caches (keep speed; we'll delete docs artefacts explicitly) ----------
-      - name: Cache Rust (no target/doc restored)
+      # ---------- Rust caches ----------
+      - name: Cache Rust
         uses: actions/cache@v4
         with:
           path: |
@@ -77,7 +77,7 @@ jobs:
         run: |
           set -euxo pipefail
 
-          # Prevent stale crate folders (e.g., old names) from leaking into Pages
+          # Ensure no stale artefacts (old crate folders) get published
           rm -rf target/doc
 
           # Optional tiny style tweak for rustdoc pages
@@ -90,11 +90,27 @@ jobs:
 
           echo "Using protoc: $(which protoc) ($(protoc --version || true))"
 
-          # EXACTLY like local: build every workspace crate, no deps
+          # Match your local command exactly: build ENTIRE workspace
           cargo doc --no-deps --all-features --workspace --jobs 2
 
-          # IMPORTANT: Do NOT overwrite target/doc/index.html.
-          # Leaving rustdoc's default index preserves the "Crates" list.
+          # Keep rustdoc's workspace pages (including crates.html),
+          # but replace the root index with a redirect to the vpr crate.
+          # This makes the Pages "View deployment" link (…/VPR/) land on …/VPR/vpr/
+          cat > target/doc/index.html <<'HTML'
+          <!doctype html>
+          <meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=./vpr/">
+          <meta name="robots" content="noindex">
+          <link rel="canonical" href="./vpr/">
+          <title>Redirecting…</title>
+          <noscript>
+            <p>This page has moved to <a href="./vpr/">VPR docs</a>.</p>
+          </noscript>
+          <script>location.replace("./vpr/");</script>
+          HTML
+
+          # Sanity: crates list should still exist at target/doc/crates.html
+          test -f target/doc/crates.html
 
       # ---------- Deploy (upload the whole target/doc) ----------
       - uses: actions/configure-pages@v5
