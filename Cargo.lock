@@ -47,7 +47,6 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "chrono",
- "vpr-temp",
  "prost",
  "prost-types",
  "serde",
@@ -58,6 +57,7 @@ dependencies = [
  "tracing-subscriber",
  "uuid",
  "vpr-proto",
+ "vpr-temp",
 ]
 
 [[package]]
@@ -340,19 +340,6 @@ name = "gimli"
 version = "0.32.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
-
-[[package]]
-name = "vpr-temp"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "serde",
- "serde_json",
- "tonic",
- "tracing",
- "uuid",
- "vpr-proto",
-]
 
 [[package]]
 name = "h2"
@@ -1320,6 +1307,19 @@ dependencies = [
  "tonic-build",
  "tracing",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "vpr-temp"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_json",
+ "tonic",
+ "tracing",
+ "uuid",
+ "vpr-proto",
 ]
 
 [[package]]

@@ -1,0 +1,131 @@
+name: Nuke docs cache (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      delete_caches:
+        description: "Delete GitHub Actions caches (Cargo/target) for this repo"
+        type: boolean
+        default: true
+        required: false
+      delete_gh_pages_branch:
+        description: "Force-delete 'gh-pages' branch before next deploy"
+        type: boolean
+        default: false
+        required: false
+      rebuild_after:
+        description: "Rebuild & deploy docs immediately after nuking"
+        type: boolean
+        default: false
+        required: false
+
+permissions:
+  contents: write         # needed if deleting gh-pages
+  actions: write          # needed for cache deletion API
+  pages: write            # only used if rebuild_after = true
+  id-token: write
+
+jobs:
+  nuke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Purge local docs artefacts
+        run: rm -rf target/doc || true
+
+      # Delete Actions caches by key (works for actions/cache@v4)
+      - name: Delete Actions caches (Cargo & docs)
+        if: ${{ inputs.delete_caches }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            // List caches (paginated)
+            let deleted = 0;
+            let page = 1;
+            while (true) {
+              const res = await github.rest.actions.getActionsCacheList({ owner, repo, per_page: 100, page });
+              const caches = res.data.actions_caches ?? [];
+              if (caches.length === 0) break;
+
+              for (const c of caches) {
+                // Match your typical keys, adjust if yours differ
+                const key = c.key || "";
+                const matches =
+                  key.startsWith(`${process.env.RUNNER_OS}-cargo-`) ||
+                  key.includes('cargo') ||
+                  key.includes('target') ||
+                  key.includes('doc');
+
+                if (matches) {
+                  await github.rest.actions.deleteActionsCacheById({ owner, repo, cache_id: c.id });
+                  deleted++;
+                }
+              }
+              if (!res.data.total_count || caches.length < 100) break;
+              page++;
+            }
+            core.notice(`Deleted ${deleted} caches`);
+
+      - name: Delete gh-pages branch (optional)
+        if: ${{ inputs.delete_gh_pages_branch }}
+        run: |
+          set -euxo pipefail
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git push origin --delete gh-pages
+          else
+            echo "gh-pages does not exist; nothing to delete."
+          fi
+
+  rebuild:
+    if: ${{ inputs.rebuild_after }}
+    needs: nuke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      # (Optional) keep registry/git caches; we just nuked stale doc artefacts above
+      - name: Cache Rust (no target/)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build docs fresh
+        env:
+          RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
+        run: |
+          set -euxo pipefail
+          rm -rf target/doc
+          cat > doc-header.html <<'HTML'
+          <style>
+            .rustdoc-toggle > summary { font-weight: 600; }
+            .search-input { border-radius: 6px; }
+          </style>
+          HTML
+          cargo doc --no-deps --all-features --package vpr --lib --jobs 2
+          test -f target/doc/vpr/index.html
+          cat > target/doc/index.html <<'HTML'
+          <!doctype html><meta charset="utf-8">
+          <meta http-equiv="refresh" content="0; url=./vpr/">
+          <meta name="robots" content="noindex">
+          <link rel="canonical" href="./vpr/"><title>Redirecting…</title>
+          <noscript><p>This page has moved to <a href="./vpr/">VPR docs</a>.</p></noscript>
+          <script>location.replace("./vpr/");</script>
+          HTML
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: target/doc
+      - uses: actions/deploy-pages@v4
