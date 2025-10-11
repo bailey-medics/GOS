@@ -42,10 +42,14 @@ build_local:
     cargo build -p api
 
 alias d := docs
-# Generate the documentation
-docs:
+# Generate the documentation (clean: 'c' will also clean out old doc files)
+docs clean="":
     #!/usr/bin/env bash
     {{initialise}} "docs"
+    if [ "{{clean}}" = "c" ]; then \
+        rm -rf target/doc; \
+        cargo clean; \
+    fi
     cargo doc --no-deps --workspace --open
 
 

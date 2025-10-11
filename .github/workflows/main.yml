@@ -12,8 +12,8 @@ on:
 
 permissions:
   contents: read
-  pages: write        # needed for Pages deploy
-  id-token: write     # needed for OIDC auth
+  pages: write
+  id-token: write
 
 concurrency:
   group: pages
@@ -54,8 +54,8 @@ jobs:
           echo "$HOME/protoc/bin" >> $GITHUB_PATH
           echo "PROTOC=$HOME/protoc/bin/protoc" >> $GITHUB_ENV
 
-      # ---------- Rust caches ----------
-      - name: Cache Rust
+      # ---------- Rust caches (keep speed; we'll delete docs artefacts explicitly) ----------
+      - name: Cache Rust (no target/doc restored)
         uses: actions/cache@v4
         with:
           path: |
@@ -68,14 +68,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
 
-      # ---------- Build docs (crate only) ----------
-      - name: Build docs (crate only, no deps)
+      # ---------- Build docs (workspace, no deps) ----------
+      - name: Build docs (workspace, no deps)
         env:
           RUSTDOCFLAGS: "-Dwarnings --cfg docsrs --html-in-header doc-header.html"
           CARGO_INCREMENTAL: "0"
           CARGO_NET_RETRY: "10"
         run: |
           set -euxo pipefail
+
+          # Prevent stale crate folders (e.g., old names) from leaking into Pages
+          rm -rf target/doc
+
           # Optional tiny style tweak for rustdoc pages
           cat > doc-header.html <<'HTML'
           <style>
@@ -85,22 +89,12 @@ jobs:
           HTML
 
           echo "Using protoc: $(which protoc) ($(protoc --version || true))"
-          cargo doc --no-deps --all-features --package vpr --lib --jobs 2
-          test -f target/doc/vpr/index.html
 
-          # Replace the root index with a tiny forwarder to ./vpr/
-          cat > target/doc/index.html <<'HTML'
-          <!doctype html>
-          <meta charset="utf-8">
-          <meta http-equiv="refresh" content="0; url=./vpr/">
-          <meta name="robots" content="noindex">
-          <link rel="canonical" href="./vpr/">
-          <title>Redirecting…</title>
-          <noscript>
-            <p>This page has moved to <a href="./vpr/">VPR docs</a>.</p>
-          </noscript>
-          <script>location.replace("./vpr/");</script>
-          HTML
+          # EXACTLY like local: build every workspace crate, no deps
+          cargo doc --no-deps --all-features --workspace --jobs 2
+
+          # IMPORTANT: Do NOT overwrite target/doc/index.html.
+          # Leaving rustdoc's default index preserves the "Crates" list.
 
       # ---------- Deploy (upload the whole target/doc) ----------
       - uses: actions/configure-pages@v5
