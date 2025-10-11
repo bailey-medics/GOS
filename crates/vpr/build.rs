@@ -4,8 +4,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     tonic_build::configure()
         .build_server(true)
         .build_client(false)
-        .compile_protos(&["../api/proto/gos/v1/gos.proto"], &["../api/proto"])?;
-    println!("cargo:rerun-if-changed=../api/proto/gos/v1/gos.proto");
+        .compile_protos(&["../api/proto/vpr/v1/vpr.proto"], &["../api/proto"])?;
+    println!("cargo:rerun-if-changed=../api/proto/vpr/v1/vpr.proto");
     println!("cargo:rerun-if-changed=../api/proto");
     Ok(())
 }

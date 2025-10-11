@@ -4,10 +4,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build_server(true)
         .build_client(false)
         .compile_protos(
-            &["crates/api/proto/gos/v1/gos.proto"],
+            &["crates/api/proto/vpr/v1/vpr.proto"],
             &["crates/api/proto"],
         )?;
-    println!("cargo:rerun-if-changed=crates/api/proto/gos/v1/gos.proto");
+    println!("cargo:rerun-if-changed=crates/api/proto/vpr/v1/vpr.proto");
     println!("cargo:rerun-if-changed=crates/api/proto");
     Ok(())
 }

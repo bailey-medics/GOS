@@ -1,4 +1,4 @@
-# GOS – GitEHR/OpenEHR Server
+# VPR – Versioned Patient Repository
 
 ## Purpose
 
@@ -37,7 +37,7 @@ We’re choosing this stack to be as fast as possible while still safe and relia
 ## Security
 
 - All communication uses encryption (TLS).
-- Only authorised systems can talk to GOS (via certificates or secure tokens).
+- Only authorised systems can talk to VPR (via certificates or secure tokens).
 - Data on disk can be encrypted if required.
 - Patients downloading their data will always get it encrypted.
 

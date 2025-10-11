@@ -1,14 +1,14 @@
 [workspace]
 members = [
 	"crates/api",
-	"crates/gos",
+	"crates/vpr",
 	"crates/gitehr-temp",
-	"crates/gos-proto",
+	"crates/vpr-proto",
 ]
 resolver = "2"
 
 [package]
-name = "gos-run"
+name = "vpr-run"
 version = "0.1.0"
 edition = "2021"
 
@@ -25,4 +25,4 @@ tonic-build = "0.12"
 prost-build = "0.13"
 
 [workspace.metadata]
-default-run = "gos-run"
+default-run = "vpr-run"

@@ -1,18 +1,18 @@
 [package]
-name = "gos"
+name = "vpr"
 version = "0.1.0"
 edition = "2021"
-description = "GOS - gRPC Health Service"
+description = "VPR - gRPC Health Service"
 license = "MIT"
-repository = "https://github.com/bailey-medics/GOS"
+repository = "https://github.com/bailey-medics/VPR"
 readme = "README.md"
 
 [lib]
-name = "gos"
+name = "vpr"
 path = "src/lib.rs"
 
 [[bin]]
-name = "gos"
+name = "vpr"
 path = "src/main.rs"
 
 [dependencies]

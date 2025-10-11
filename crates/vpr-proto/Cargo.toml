@@ -1,10 +1,10 @@
 [package]
-name = "gos-proto"
+name = "vpr-proto"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "gos_proto"
+name = "vpr_proto"
 path = "src/lib.rs"
 
 [build-dependencies]
