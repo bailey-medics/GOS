@@ -11,7 +11,7 @@ Overview
 - Key crates:
   - `crates/api` — gRPC server binary (uses `tonic`, entry at `crates/api/src/main.rs`).
   - `crates/vpr-proto` — protobuf generation (build script produces `pb` module; see `crates/vpr-proto/src/lib.rs`).
-  - `crates/vpr` / `crates/gitehr-temp` — service implementation types re-exported by `api` (see `crates/api/src/service.rs`).
+  - `crates/vpr` / `crates/vpr-temp` — service implementation types re-exported by `api` (see `crates/api/src/service.rs`).
 
 Important files to reference
 - `README.md` — high-level project description and docs link.

@@ -1,10 +1,10 @@
 [package]
-name = "gitehr-temp"
+name = "vpr-temp"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "gitehr_temp"
+name = "vpr_temp"
 path = "src/lib.rs"
 
 [dependencies]

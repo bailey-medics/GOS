@@ -2,6 +2,6 @@
 // can continue to reference `api::service::pb`.
 pub use vpr_proto::pb;
 
-// Re-export the service implementation type directly from the `gitehr-temp` crate.
+// Re-export the service implementation type directly from the `vpr-temp` crate.
 // This ensures the type is publicly available as `api::service::VprService`.
-pub use gitehr_temp::VprService;
+pub use vpr_temp::VprService;
