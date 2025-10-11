@@ -2,24 +2,24 @@ use std::net::SocketAddr;
 use tonic::transport::Server;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-use api::{pb::gos_server::GosServer, GosService};
+use api::{pb::vpr_server::VprServer, VprService};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::from_default_env().add_directive("gos=info".parse()?))
+        .with(tracing_subscriber::EnvFilter::from_default_env().add_directive("vpr=info".parse()?))
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let addr: SocketAddr = std::env::var("GOS_ADDR")
+    let addr: SocketAddr = std::env::var("VPR_ADDR")
         .unwrap_or_else(|_| "0.0.0.0:50051".into())
         .parse()?;
 
-    tracing::info!("Starting GOS gRPC on {}", addr);
+    tracing::info!("Starting VPR gRPC on {}", addr);
 
-    let svc = GosService;
+    let svc = VprService;
     Server::builder()
-        .add_service(GosServer::new(svc))
+        .add_service(VprServer::new(svc))
         .serve(addr)
         .await?;
 

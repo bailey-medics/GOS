@@ -1,8 +1,8 @@
 use tonic::{Request, Response, Status};
 
-// Use the shared gos-proto crate for generated protobuf types.
-pub use gos_proto::pb;
-use gos_proto::pb::{gos_server::Gos, CreatePatientReq, CreatePatientRes, HealthRes, Patient};
+// Use the shared vpr-proto crate for generated protobuf types.
+pub use vpr_proto::pb;
+use vpr_proto::pb::{vpr_server::Vpr, CreatePatientReq, CreatePatientRes, HealthRes, Patient};
 
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -11,14 +11,14 @@ use std::path::Path;
 use uuid::Uuid;
 
 #[derive(Default, Clone)]
-pub struct GosService;
+pub struct VprService;
 
 #[tonic::async_trait]
-impl Gos for GosService {
+impl Vpr for VprService {
     async fn health(&self, _req: Request<()>) -> Result<Response<HealthRes>, Status> {
         Ok(Response::new(HealthRes {
             ok: true,
-            message: "GOS is alive".into(),
+            message: "VPR is alive".into(),
         }))
     }
 
@@ -179,4 +179,4 @@ impl Gos for GosService {
 }
 
 // Re-export the service type for consumers
-pub use GosService as GitehrTempGosService;
+pub use VprService as GitehrTempVprService;

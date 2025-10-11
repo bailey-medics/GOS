@@ -34,6 +34,13 @@ abbreviate-just:
     echo "source ~/.zshrc"
 
 
+alias bl := build_local
+# Build the local Rust binaries
+build_local:
+    #!/usr/bin/env bash
+    {{initialise}} "build_local"
+    cargo build -p api
+
 alias d := docs
 # Generate the documentation
 docs:
@@ -55,7 +62,7 @@ alias g := gui
 gui:
     #!/usr/bin/env bash
     {{initialise}} "gui"
-    grpcui -proto crates/api/proto/gos/v1/gos.proto -plaintext localhost:50051
+    grpcui -proto crates/api/proto/vpr/v1/vpr.proto -plaintext localhost:50051
 
 
 alias pc := pre-commit

@@ -8,19 +8,19 @@ RUN apk add --no-cache musl-dev gcc protobuf-dev
 RUN cargo install cargo-watch
 
 # Copy dependency files for initial caching (without full source)
-# We don't copy build.rs (it moved into crates/gos); copy workspace manifest and
+# We don't copy build.rs (it moved into crates/vpr); copy workspace manifest and
 # the per-crate Cargo.toml files so cargo can resolve dependencies.
 COPY Cargo.toml Cargo.lock ./
 COPY crates ./crates/
 
 # Create minimal dummy source for the crates so we can cache dependencies by
 # building the api package. The real source will be mounted during development.
-RUN mkdir -p crates/api/src crates/gos/src \
+RUN mkdir -p crates/api/src crates/vpr/src \
  && echo 'fn main(){}' > crates/api/src/main.rs \
  && echo 'pub fn dummy() {}' > crates/api/src/lib.rs \
- && echo 'fn main(){}' > crates/gos/src/main.rs \
- && echo 'pub fn dummy() {}' > crates/gos/src/lib.rs
-# Ensure the workspace-level package (gos-run) has a dummy binary while caching
+ && echo 'fn main(){}' > crates/vpr/src/main.rs \
+ && echo 'pub fn dummy() {}' > crates/vpr/src/lib.rs
+# Ensure the workspace-level package (vpr-run) has a dummy binary while caching
 RUN mkdir -p src && echo 'fn main() {}' > src/main.rs
 
 # Build only the api package to prime the dependency cache

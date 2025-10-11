@@ -4,14 +4,14 @@
 #   chmod +x file_db_time_trial.sh
 #   PGURL="postgres://postgres:postgres@localhost:5432/postgres" N=10000 ./file_db_time_trial.sh
 # Tunables (env):
-#   BENCH_ROOT="$HOME/gos_bench"  N=10000  PGURL="postgres://user:pass@host:5432/db"
+#   BENCH_ROOT="$HOME/vpr_bench"  N=10000  PGURL="postgres://user:pass@host:5432/db"
 
 set -euo pipefail
 
 # --------------------------
 # Config
 # --------------------------
-BENCH_ROOT="${BENCH_ROOT:-$HOME/gos_bench}"
+BENCH_ROOT="${BENCH_ROOT:-$HOME/vpr_bench}"
 N=1000
 PGURL="${PGURL:-postgres://postgres:postgres@localhost:5432/postgres}"
 
@@ -154,8 +154,8 @@ run_git_batch10(){
 prepare_pg(){
   banner "Preparing Postgres table (durable, simple indexes)"
   psql "$PGURL" -q <<'SQL'
-DROP TABLE IF EXISTS gos_records;
-CREATE TABLE gos_records (
+DROP TABLE IF EXISTS vpr_records;
+CREATE TABLE vpr_records (
   id          bigserial primary key,
   patient_id  text not null,
   kind        text not null,
@@ -164,8 +164,8 @@ CREATE TABLE gos_records (
   created_at  timestamptz not null default now(),
   doc         jsonb not null
 );
-CREATE INDEX ON gos_records (patient_id, created_at desc);
-CREATE INDEX ON gos_records (kind, created_at desc);
+CREATE INDEX ON vpr_records (patient_id, created_at desc);
+CREATE INDEX ON vpr_records (kind, created_at desc);
 SQL
 }
 
@@ -181,7 +181,7 @@ run_pg_per_tx(){
     DOC=$(cat "$BENCH_ROOT/payloads/$key.json")
     PGPASSWORD="$(echo "$PGURL" | sed -n 's#.*postgres://[^:]*:\([^@]*\)@.*#\1#p')" \
     psql "$PGURL" -q -c \
-      "INSERT INTO gos_records (patient_id,kind,uid,version,doc)
+      "INSERT INTO vpr_records (patient_id,kind,uid,version,doc)
        VALUES ('${pid}','letters','${uid}',1,'${DOC}'::jsonb);"
     i=$((i+1))
   done
@@ -202,7 +202,7 @@ run_pg_batch10(){
       pid="patient-$(printf %06d $((i % 2000)))"
       uid="uid-$key"
       DOC=$(cat "$BENCH_ROOT/payloads/$key.json")
-      SQL+="INSERT INTO gos_records (patient_id,kind,uid,version,doc)
+      SQL+="INSERT INTO vpr_records (patient_id,kind,uid,version,doc)
             VALUES ('${pid}','letters','${uid}',1,'${DOC}'::jsonb);"
       i=$((i+1))
     done

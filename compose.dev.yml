@@ -1,16 +1,16 @@
 version: '3.8'
 
 services:
-  gos:
+  vpr:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: gos-dev
+    container_name: vpr-dev
     ports:
       - "50051:50051"
     environment:
-      - GOS_ADDR=0.0.0.0:50051
-      - RUST_LOG=gos=debug,info
+      - VPR_ADDR=0.0.0.0:50051
+      - RUST_LOG=vpr=debug,info
     volumes:
       # Mount source for development (for live reload)
       # Mount the repository so cargo-watch sees the workspace
@@ -22,13 +22,13 @@ services:
       - "cargo-cache:/app/target"
       
       # Mount logs directory (optional)
-      - ./logs:/home/gos/logs
+      - ./logs:/home/vpr/logs
       - ./patient_data:/patient_data
     networks:
-      - gos-network
+      - vpr-network
     restart: unless-stopped
     # Ensure cargo runs the api binary explicitly (workspace has two binaries)
-    command: ["/bin/sh", "-c", "cargo watch -x 'run -p api --bin gos-api'"]
+    command: ["/bin/sh", "-c", "cargo watch -x 'run -p api --bin vpr-api'"]
     healthcheck:
       test: ["CMD-SHELL", "grpcurl -plaintext localhost:50051 list || exit 1"]
       interval: 30s
@@ -39,11 +39,11 @@ services:
   # Optional: Add a gRPC client tool for testing
   grpcurl:
     image: fullstorydev/grpcurl:latest
-    container_name: gos-grpcurl
+    container_name: vpr-grpcurl
     networks:
-      - gos-network
+      - vpr-network
     depends_on:
-      - gos
+      - vpr
     profiles:
       - tools
     command: 
@@ -51,15 +51,15 @@ services:
       - -c
       - |
         echo "gRPC testing tool ready. Use:"
-        echo "docker compose -f compose.dev.yml exec grpcurl grpcurl -plaintext gos:50051 list"
+        echo "docker compose -f compose.dev.yml exec grpcurl grpcurl -plaintext vpr:50051 list"
         sleep infinity
 
 networks:
-  gos-network:
+  vpr-network:
     driver: bridge
 
 volumes:
   cargo-cache:
     driver: local
-  gos-logs:
+  vpr-logs:
     driver: local

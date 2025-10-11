@@ -2,7 +2,7 @@
 name = "api"
 version = "0.1.0"
 edition = "2021"
-description = "GOS API crate (gRPC health service)"
+description = "VPR API crate (gRPC health service)"
 license = "MIT"
 
 [lib]
@@ -10,7 +10,7 @@ name = "api"
 path = "src/lib.rs"
 
 [[bin]]
-name = "gos-api"
+name = "vpr-api"
 path = "src/main.rs"
 
 [dependencies]
@@ -26,4 +26,4 @@ serde_json = "1.0"
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 gitehr-temp = { path = "../gitehr-temp" }
-gos-proto = { path = "../gos-proto" }
+vpr-proto = { path = "../vpr-proto" }

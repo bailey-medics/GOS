@@ -85,21 +85,21 @@ jobs:
           HTML
 
           echo "Using protoc: $(which protoc) ($(protoc --version || true))"
-          cargo doc --no-deps --all-features --package gos --lib --jobs 2
-          test -f target/doc/gos/index.html
+          cargo doc --no-deps --all-features --package vpr --lib --jobs 2
+          test -f target/doc/vpr/index.html
 
-          # Replace the root index with a tiny forwarder to ./gos/
+          # Replace the root index with a tiny forwarder to ./vpr/
           cat > target/doc/index.html <<'HTML'
           <!doctype html>
           <meta charset="utf-8">
-          <meta http-equiv="refresh" content="0; url=./gos/">
+          <meta http-equiv="refresh" content="0; url=./vpr/">
           <meta name="robots" content="noindex">
-          <link rel="canonical" href="./gos/">
+          <link rel="canonical" href="./vpr/">
           <title>Redirecting…</title>
           <noscript>
-            <p>This page has moved to <a href="./gos/">GOS docs</a>.</p>
+            <p>This page has moved to <a href="./vpr/">VPR docs</a>.</p>
           </noscript>
-          <script>location.replace("./gos/");</script>
+          <script>location.replace("./vpr/");</script>
           HTML
 
       # ---------- Deploy (upload the whole target/doc) ----------

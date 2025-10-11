@@ -14,7 +14,7 @@ DATA=$(printf '{"firstName": "%s", "lastName": "%s"}' "$FIRST" "$LAST")
 
 grpcurl -plaintext \
   -import-path ../crates/api/proto \
-  -proto ../crates/api/proto/gos/v1/gos.proto \
+  -proto ../crates/api/proto/vpr/v1/vpr.proto \
   -d "$DATA" \
-  localhost:50051 gos.v1.GOS/CreatePatient
+  localhost:50051 vpr.v1.VPR/CreatePatient
 

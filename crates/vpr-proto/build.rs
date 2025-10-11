@@ -1,5 +1,5 @@
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // The crate lives in `<repo>/crates/gos-proto` so the workspace repo root
+    // The crate lives in `<repo>/crates/vpr-proto` so the workspace repo root
     // is two levels up from CARGO_MANIFEST_DIR.
     let manifest_dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"));
     let repo_root = manifest_dir
@@ -10,8 +10,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let proto_root = repo_root.join("proto");
     // Try the repo-level `proto/...` then fall back to `crates/api/proto/...`.
-    let candidate1 = proto_root.join("gos/v1/gos.proto");
-    let candidate2 = repo_root.join("crates/api/proto/gos/v1/gos.proto");
+    let candidate1 = proto_root.join("vpr/v1/vpr.proto");
+    let candidate2 = repo_root.join("crates/api/proto/vpr/v1/vpr.proto");
 
     let (proto_file, proto_include_root) = if candidate1.exists() {
         (candidate1, proto_root)
