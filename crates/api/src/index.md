@@ -3,7 +3,9 @@
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 ![gRPC](https://img.shields.io/badge/gRPC-4285F4?style=for-the-badge&logo=google&logoColor=white)
 
-A play with GitEHR openEHR in server form - using rust only
+A play with VPR openEHR in server form - using rust only
+
+---- API ----
 
 Install pre-commit hooks
 

@@ -179,4 +179,4 @@ impl Vpr for VprService {
 }
 
 // Re-export the service type for consumers
-pub use VprService as GitehrTempVprService;
+pub use VprService as VPRTempVprService;

@@ -2,7 +2,7 @@
 members = [
 	"crates/api",
 	"crates/vpr",
-	"crates/gitehr-temp",
+	"crates/vpr-temp",
 	"crates/vpr-proto",
 ]
 resolver = "2"

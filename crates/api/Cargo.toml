@@ -25,5 +25,5 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde"] }
-gitehr-temp = { path = "../gitehr-temp" }
+vpr-temp = { path = "../vpr-temp" }
 vpr-proto = { path = "../vpr-proto" }
