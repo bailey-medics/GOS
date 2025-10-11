@@ -87,3 +87,12 @@ Features needed for clinicians and admins to manage records in a multi-patient e
 ```bash
 cargo build --features org
 ```
+
+## Wrong patient
+
+- Redact
+- Stub
+  - Preserve cryptographic proof of what was removed
+  - Hashed Message Authentication Code (mathematical fingerprint of the original data)
+- Quarantine vault
+  - Quarantine bytes
