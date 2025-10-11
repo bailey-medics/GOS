@@ -3,7 +3,7 @@
 ## Purpose
 
 - Store patient records in a version controlled manner, using Git.
-- Serve those records very quickly to clinicians, admins, or patients.
+- Serve those records fast to clinicians, admins, or patients.
 - Keep everything accurate, secure, and auditable.
 
 ## Technology Choices
